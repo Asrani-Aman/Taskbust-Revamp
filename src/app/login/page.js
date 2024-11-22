@@ -1,19 +1,3 @@
-// import { signIn } from "../../../auth"
-
-// export default function SignIn() {
-//   return (
-// <form
-//   action={async () => {
-//     "use server"
-//     await signIn("google")
-//   }}
-// >
-//       <button type="submit">Signin with Google</button>
-//     </form>
-//   )
-// }
-// login page
-
 import React from "react";
 import { AiOutlineTwitter } from "react-icons/ai";
 import { BiLogoFacebook } from "react-icons/bi";
@@ -21,9 +5,53 @@ import { FaGoogle } from "react-icons/fa";
 //next-auth
 import { auth, signIn, signOut } from "../../../auth";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
-const Login = () => {
+export default async function Login() {
+  const session = await auth();
+  const TaskGiver = session ? session.user : null;
+  // console.log(TaskGiver.name);
+
+  const AuthenticatedView = () => {
+    return (
+      <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center gap-6 p-4">
+        <div className="bg-gray-800 p-8 rounded-lg shadow-lg text-center max-w-md w-full">
+          <h2 className="text-2xl font-bold text-white mb-4">
+            Welcome back, <span className="text-blue-400">{session?.user?.name}</span>
+          </h2>
+          <p className="text-gray-300 mb-6">You're already signed in</p>
+          
+          <div className="flex gap-4 justify-center">
+            <Link 
+              href="/dashboard" 
+              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-300"
+            >
+              Go to Dashboard
+            </Link>
+            
+            <form action={async () => {
+              "use server";
+              await signOut();
+              redirect('/');
+            }}>
+              <button 
+                type="submit"
+                className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-all duration-300"
+              >
+                Sign Out
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  if (session) {
+    return <AuthenticatedView />;
+  }
   return (
+
     <section className="h-screen flex flex-col md:flex-row justify-center space-y-10 md:space-y-0 md:space-x-16 items-center my-2 mx-5 md:mx-0 md:my-0">
       <div className="md:w-1/3 max-w-sm">
         <img
@@ -36,7 +64,7 @@ const Login = () => {
           <form
             action={async () => {
               "use server";
-              await signIn("google");
+              await signIn("google", { redirect: '/dashboard' });
             }}
           >
             <button
@@ -95,4 +123,3 @@ const Login = () => {
   );
 };
 
-export default Login;

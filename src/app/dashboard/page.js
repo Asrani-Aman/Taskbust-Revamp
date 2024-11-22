@@ -1,15 +1,13 @@
 'use client'
-import { useEffect, useState, useLayoutEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 
-
-const Dashboard = () => {
+export default function Dashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [tasks, setTasks] = useState([]);
-
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (status === "unauthenticated") {
       router.push('/login');
     }
@@ -43,6 +41,4 @@ const Dashboard = () => {
       </div>
     </div>
   );
-};
-
-export default Dashboard;
+}
